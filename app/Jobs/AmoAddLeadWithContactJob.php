@@ -41,7 +41,7 @@ class AmoAddLeadWithContactJob implements ShouldQueue
         $lead = new LeadModel();
         $lead->setName($this->request->json('name'))
             ->setPipelineId(env('AMOCRM_LEADS_PIPELINE_ID'))
-            ->setStatusId(env('AMOCRM_LEADS_FIRST_CONTACT_ID'))
+            ->setStatusId(env('AMOCRM_LEADS_FIRST_CONTACT_STATUS_ID'))
             ->setCustomFieldsValues(
                 (new CustomFieldsValuesCollection())->add(
                     (new TextCustomFieldValuesModel())
