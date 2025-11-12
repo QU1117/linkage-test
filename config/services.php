@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'amocrm' => [
+        'client_id' => env('AMOCRM_CLIENT_ID'),
+        'client_secret' => env('AMOCRM_CLIENT_SECRET'),
+        'redirect_uri' => env('AMOCRM_REDIRECT_URI'),
+        'base_domain' => env('AMOCRM_BASE_DOMAIN'),
+        'access_token' => env('AMOCRM_ACCESS_TOKEN'),
+        'refresh_token' => env('AMOCRM_REFRESH_TOKEN'),
+    ],
 ];
