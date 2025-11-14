@@ -4,4 +4,6 @@
 константы начинаются с коммента "реквизиты для клиента amoCRM".
 
 Для того чтобы поднять приложение:
-``docker compose up -d``
+``docker compose up --build -d``
+
+Запустить миграции: ``docker exec php_app php artisan migrate``
