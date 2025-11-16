@@ -42,6 +42,7 @@ return [
             'commands' => [
                 // Acme\Project\Commands\MyTelegramBot\BotCommand::class
             ],
+            'chat_id' => env('TELEGRAM_CHAT_ID'),
         ],
 
         //        'mySecondBot' => [
