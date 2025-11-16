@@ -16,7 +16,6 @@ use AmoCRM\Models\CustomFieldsValues\ValueModels\TextCustomFieldValueModel;
 use AmoCRM\Models\LeadModel;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Http\Request;
 use AmoCRM\Models\ContactModel;
 use AmoCRM\Collections\ContactsCollection;
 use App\Services\EventLogger;
@@ -24,22 +23,23 @@ use App\Services\EventLogger;
 class AmoAddLeadWithContactJob implements ShouldQueue
 {
     use Queueable;
+    private array $userData;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(protected Request $request, protected AmoCRMApiClient $amoCRMApiClient)
+    public function __construct(array $userData)
     {
-        //
+        $this->userData = $userData;
     }
 
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(AmoCRMApiClient $amoCRMApiClient): void
     {
         $lead = new LeadModel();
-        $lead->setName($this->request->json('name'))
+        $lead->setName($this->userData['name'])
             ->setPipelineId(env('AMOCRM_LEADS_PIPELINE_ID'))
             ->setStatusId(env('AMOCRM_LEADS_FIRST_CONTACT_STATUS_ID'))
             ->setCustomFieldsValues(
@@ -49,14 +49,14 @@ class AmoAddLeadWithContactJob implements ShouldQueue
                         ->setValues(
                             (new TextCustomFieldValueCollection())->add(
                                 (new TextCustomFieldValueModel())->setValue(
-                                    $this->request->json('apartment_address'))
+                                    $this->userData['apartment_address'])
                             )
                         )
                 )
             );
 
         $contact = new ContactModel();
-        $contact->setName($this->request->json('name'))
+        $contact->setName($this->userData['name'])
             ->setCustomFieldsValues(
                 (new CustomFieldsValuesCollection())->add(
                     (new MultitextCustomFieldValuesModel())
@@ -64,7 +64,7 @@ class AmoAddLeadWithContactJob implements ShouldQueue
                         ->setValues(
                             (new MultitextCustomFieldValueCollection())->add(
                                 (new MultitextCustomFieldValueModel())->setValue(
-                                    $this->request->json('phone')
+                                    $this->userData['phone']
                                 )
                             )
                         )
@@ -74,12 +74,10 @@ class AmoAddLeadWithContactJob implements ShouldQueue
         $lead->setContacts((new ContactsCollection())->add($contact));
 
         try {
-            $this->amoCRMApiClient->leads()->addOne($lead);
-            $this->amoCRMApiClient->contacts()->addOne($contact);
+            $amoCRMApiClient->leads()->addOne($lead);
+            $amoCRMApiClient->contacts()->addOne($contact);
         } catch (AmoCRMMissedTokenException|AmoCRMoAuthApiException|AmoCRMApiException $e) {
-            EventLogger::log('Exception', 'AmoCRM API Exception: ', data: $e->getMessage());
+            EventLogger::log('Exception', 'AmoCRM API Exception: ', $e->getMessage());
         }
-
-        Eventlogger::log('Lead', 'Lead created',  $this->request->json());
     }
 }
