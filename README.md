@@ -6,11 +6,20 @@
 ---
 
 Для того чтобы поднять приложение:
+
+``composer install``
+
 ``docker compose up --build -d``
+
+---
 
 Запустить миграции: ``docker exec php_app php artisan migrate``
 
+---
+
 Запуск воркера очередей: ``docker exec php_app php artisan queue:work``
+
+---
 
 Маршрут для вебхука: ``localhost:8080/api/webhook``
 
