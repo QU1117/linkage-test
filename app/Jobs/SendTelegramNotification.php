@@ -4,8 +4,6 @@ namespace App\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Telegram\Bot\Api;
-use Telegram\Bot\Exceptions\TelegramSDKException;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Services\EventLogger;
 
@@ -32,7 +30,7 @@ class SendTelegramNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        $chatId = config('telegram.bots.mybot.token');
+        $chatId = config('telegram.bots.mybot.chat_id');
 
         if (!$chatId) {
             EventLogger::log('Telegram Notification Fail',
