@@ -23,10 +23,10 @@ class LogPostRequests
             EventLogger::log(
                 $request->method() . ' ' . 'log',
                 'Automatic POST log',
-                $request->all()
+                json_encode($request->all())
             );
         }
 
-        return $next($request);
+        return $response;
     }
 }
