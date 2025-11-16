@@ -11,7 +11,7 @@ class EventLogger
         (new EventLog([
             'type' => $type,
             'description' => $description,
-            'data' => $data
+            'request_data' => $data
         ]))->save();
     }
 }
