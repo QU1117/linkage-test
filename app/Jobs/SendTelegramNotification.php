@@ -4,7 +4,8 @@ namespace App\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Http\Request;
+use Telegram\Bot\Api;
+use Telegram\Bot\Exceptions\TelegramSDKException;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use App\Services\EventLogger;
 
@@ -12,12 +13,18 @@ class SendTelegramNotification implements ShouldQueue
 {
     use Queueable;
 
+    private string $userName;
+    private string $userPhone;
+    private string $apartment_address;
+
     /**
      * Create a new job instance.
      */
-    public function __construct(protected Request $request)
+    public function __construct(array $userData)
     {
-        //
+        $this->userName = $userData['name'];
+        $this->userPhone = $userData['phone'];
+        $this->apartment_address = $userData['apartment_address'];
     }
 
     /**
@@ -25,16 +32,19 @@ class SendTelegramNotification implements ShouldQueue
      */
     public function handle(): void
     {
-        Telegram::sendMessage([
-            'chat_id' => env('TELEGRAM_CHAT_ID'),
-            'text' => "Новая заявка от клиента " . $this->request->json('name') . ", " .
-                "телефон: " . $this->request->json('phone') . ", " .
-                "объект: " . $this->request->json('apartment_address'),
-        ]);
+        $chatId = config('telegram.bots.mybot.token');
 
-        EventLogger::log(
-            'Telegram',
-            'Telegram notification sent'
-        );
+        if (!$chatId) {
+            EventLogger::log('Telegram Notification Fail',
+                'Error in SendTelegramNotification Job: chat_id is empty');
+            return;
+        }
+
+        Telegram::sendMessage([
+            'chat_id' => $chatId,
+            'text' => "Новая заявка от клиента {$this->userName}, "
+                . "телефон: {$this->userPhone}, "
+                . "объект: {$this->apartment_address}"
+        ]);
     }
 }
