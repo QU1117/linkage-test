@@ -71,11 +71,11 @@ class AmoAddLeadWithContactJob implements ShouldQueue
                 )
             );
 
-        $lead->setContacts((new ContactsCollection())->add($contact));
 
         try {
+            $addedContact = $amoCRMApiClient->contacts()->addOne($contact);
+            $lead->setContacts((new ContactsCollection())->add($addedContact));
             $amoCRMApiClient->leads()->addOne($lead);
-            $amoCRMApiClient->contacts()->addOne($contact);
         } catch (AmoCRMMissedTokenException|AmoCRMoAuthApiException|AmoCRMApiException $e) {
             EventLogger::log('Exception', 'AmoCRM API Exception: ', $e->getMessage());
         }
