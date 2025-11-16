@@ -13,4 +13,6 @@ class EventLog extends Model
     protected $casts = [
         'request_data' => 'array',
     ];
+
+    protected $table = 'logs';
 }
